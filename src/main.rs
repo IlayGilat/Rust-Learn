@@ -97,35 +97,32 @@ fn execute(command: Command) {
     };
 }
 fn parse_command(args: Vec<String>) -> Result<Command, String> {
-    match args.first() {
-        None => Err(String::from("Missing Command")),
-        Some(command_name) => {
-            if command_name == "list" {
-                Ok(Command::List)
-            } else if command_name == "add" {
-                match args.get(1) {
-                    None => Err(String::from("Missing task text")),
-                    Some(task) => Ok(Command::Add(task.clone())),
-                }
-            } else if command_name == "done" {
-                match args.get(1) {
-                    None => Err(String::from("Missing task number")),
-                    Some(task_text) => match task_text.parse::<usize>() {
-                        Ok(task_number) => {
-                            if 1 <= task_number {
-                                Ok(Command::Done(task_number))
-                            } else {
-                                Err(String::from("Task number out of bounds"))
-                            }
-                        }
-                        Err(error) => {
-                            Err(format!("Error while trying to parse task number: {error}"))
-                        }
-                    },
-                }
-            } else {
-                Err(String::from("Unknown Command Error"))
-            }
+    let Some(command_name) = args.first() else {
+        return Err(String::from("Missing Command"));
+    };
+
+    if command_name == "list" {
+        Ok(Command::List)
+    } else if command_name == "add" {
+        match args.get(1) {
+            None => Err(String::from("Missing task text")),
+            Some(task) => Ok(Command::Add(task.clone())),
         }
+    } else if command_name == "done" {
+        match args.get(1) {
+            None => Err(String::from("Missing task number")),
+            Some(task_text) => match task_text.parse::<usize>() {
+                Ok(task_number) => {
+                    if 1 <= task_number {
+                        Ok(Command::Done(task_number))
+                    } else {
+                        Err(String::from("Task number out of bounds"))
+                    }
+                }
+                Err(error) => Err(format!("Error while trying to parse task number: {error}")),
+            },
+        }
+    } else {
+        Err(String::from("Unknown Command Error"))
     }
 }
